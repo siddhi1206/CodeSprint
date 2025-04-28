@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organ Donation Management System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--dark-color);
+            background-color: #f8f9fa;
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                        url('https://via.placeholder.com/1500x500');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 150px 0;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .info-card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            margin-bottom: 30px;
+            background-color: white;
+        }
+
+        .info-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .info-card h3 {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .stat-card {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 50px 0 20px;
+            margin-top: 50px;
+        }
+
+        .testimonial-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .quote-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .cta-section {
+            background-color: var(--secondary-color);
+            padding: 80px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 25px;
+            font-weight: 600;
+        }
+
+        .btn-outline-light {
+            font-weight: 600;
+            padding: 10px 25px;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: white !important;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+        }
+
+        .nav-link {
+            font-weight: 600;
+            color: var(--dark-color) !important;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .login-btn {
+            background-color: var(--primary-color);
+            color: white !important;
+            border-radius: 20px;
+            padding: 8px 20px !important;
+        }
+
+        .login-btn:hover {
+            background-color: #2980b9;
+            color: white !important;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 100px 0;
+            }
+
+            .hero-section h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <i class="fas fa-heartbeat me-2"></i>LifeLink Donation
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('home') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#statistics">Statistics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#testimonials">Testimonials</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link login-btn ms-3" href="{{ url_for('login') }}">Admin Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <h1>Give the Gift of Life</h1>
+            <p class="lead mb-4">One organ donor can save up to 8 lives and enhance many more through tissue donation</p>
+            <a href="#about" class="btn btn-outline-light btn-lg">Learn More</a>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <section id="about" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-4">Why Organ Donation Matters</h2>
+                <p class="lead text-muted">Understanding the importance of becoming an organ donor</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="info-card p-4 text-center">
+                        <div class="card-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3>Save Lives</h3>
+                        <p>A single organ donor can save up to 8 lives through donation of heart, lungs, liver, kidneys, pancreas and intestines.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="info-card p-4 text-center">
+                        <div class="card-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <h3>Restore Sight</h3>
+                        <p>Cornea donations can restore sight to those suffering from corneal blindness or injury.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="info-card p-4 text-center">
+                        <div class="card-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h3>Heal Lives</h3>
+                        <p>Tissue donations like skin, bone, and heart valves can help burn victims, cancer patients, and those needing reconstructive surgery.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-lg-8 mx-auto">
+                    <div class="card p-4">
+                        <h4 class="mb-3">The Organ Donation Process</h4>
+                        <p>Organ donation is a process where a person allows an organ of their own to be removed legally and transplanted into another person through surgery. Organs that can be donated include:</p>
+                        <ul>
+                            <li><strong>Heart:</strong> For patients with end-stage heart failure</li>
+                            <li><strong>Lungs:</strong> For patients with various forms of end-stage lung disease</li>
+                            <li><strong>Liver:</strong> For patients with end-stage liver failure</li>
+                            <li><strong>Kidneys:</strong> For patients with end-stage renal disease</li>
+                            <li><strong>Pancreas:</strong> For patients with type 1 diabetes</li>
+                            <li><strong>Eyes:</strong> Corneas can restore sight to the blind</li>
+                        </ul>
+                        <p>The donation process involves careful matching of donors and recipients based on blood type, tissue type, organ size, medical urgency, and geographic location.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section id="statistics" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-4">Donation Statistics</h2>
+                <p class="lead text-muted">The impact of organ donation around the world</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">120K+</div>
+                        <p>People waiting for a transplant</p>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">20</div>
+                        <p>People die each day waiting for a transplant</p>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">8</div>
+                        <p>Lives can be saved by one donor</p>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">75</div>
+                        <p>Lives can be enhanced through tissue donation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-4">Lives Changed</h2>
+                <p class="lead text-muted">Stories from recipients and donor families</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="testimonial-card">
+                        <div class="quote-icon">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                        <p class="mb-4">"After waiting 3 years for a new heart, I received the gift of life from a donor I'll never meet. Now I can watch my children grow up. There are no words to express my gratitude."</p>
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h5 class="mb-0">Maya P.</h5>
+                                <small class="text-muted">Heart Recipient</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="testimonial-card">
+                        <div class="quote-icon">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                        <p class="mb-4">"Knowing that our son saved four lives after his tragic accident has given our family some peace. His legacy lives on in others, and that means everything to us."</p>
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h5 class="mb-0">The Johnson Family</h5>
+                                <small class="text-muted">Donor Family</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta-section">
+        <div class="container">
+            <h2 class="display-4 mb-4">Become a Donor Today</h2>
+            <p class="lead mb-4">Your decision to become an organ donor can save multiple lives</p>
+            <a href="#" class="btn btn-light btn-lg">Register as a Donor</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h4><i class="fas fa-heartbeat me-2"></i>LifeLink Donation</h4>
+                    <p>Our mission is to connect organ donors with recipients, saving lives and bringing hope to those in need.</p>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <h4>Quick Links</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-light">About Us</a></li>
+                        <li><a href="#" class="text-light">How to Register</a></li>
+                        <li><a href="#" class="text-light">FAQs</a></li>
+                        <li><a href="#" class="text-light">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <h4>Contact</h4>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Donation St, Medical City</li>
+                        <li><i class="fas fa-phone me-2"></i> (123) 456-7890</li>
+                        <li><i class="fas fa-envelope me-2"></i> info@lifelink.org</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="text-center pt-4 border-top border-secondary mt-4">
+                <p>&copy; 2025 LifeLink Organ Donation Management System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

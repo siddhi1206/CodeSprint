@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Organ Donation Management System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background-color: var(--dark-color);
+            color: white;
+            padding-top: 20px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 12px 20px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .sidebar-menu li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 20px;
+            margin-bottom: 30px;
+        }
+
+        .navbar .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background-color: #c0392b;
+            color: white;
+        }
+
+        .dashboard-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .dashboard-icon {
+            background-color: var(--primary-color);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 20px;
+        }
+
+        .dashboard-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+
+        .dashboard-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .dashboard-action {
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .dashboard-action:hover {
+            text-decoration: underline;
+        }
+
+        .recent-activity {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+        }
+
+        .activity-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            background-color: #e3f2fd;
+            color: var(--primary-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin-right: 15px;
+        }
+
+        .activity-info h5 {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            color: #6c757d;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                padding: 0;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            .sidebar.active {
+                width: var(--sidebar-width);
+                padding-top: 20px;
+            }
+
+            .toggle-btn {
+                display: block !important;
+            }
+        }
+
+        .toggle-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--dark-color);
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4><i class="fas fa-heartbeat me-2"></i>LifeLink</h4>
+            <p class="small">Organ Donation Management</p>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('dashboard') }}" class="active">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('donors') }}">
+                    <i class="fas fa-user-plus"></i> Donor Management
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('recipients') }}">
+                    <i class="fas fa-procedures"></i> Recipient Management
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('organ_matching') }}">
+                    <i class="fas fa-exchange-alt"></i> Organ Matching
+                </a>
+            </li>
+            <li>
+                <a href="#reports">
+                    <i class="fas fa-chart-bar"></i> Reports
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <nav class="navbar">
+            <div class="container-fluid">
+                <button class="toggle-btn" id="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="navbar-brand mb-0 h1">Admin Dashboard</span>
+                <div>
+                    <span class="me-3">Welcome, Admin</span>
+                    <a href="{{ url_for('logout') }}" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="dashboard-card">
+                        <div class="d-flex align-items-center">
+                            <div class="dashboard-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div>
+                                <div class="dashboard-title">Total Donors</div>
+                                <div class="dashboard-number">9</div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <a href="{{ url_for('donors') }}" class="dashboard-action">
+                                View Details <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="dashboard-card">
+                        <div class="d-flex align-items-center">
+                            <div class="dashboard-icon">
+                                <i class="fas fa-procedures"></i>
+                            </div>
+                            <div>
+                                <div class="dashboard-title">Total Recipients</div>
+                                <div class="dashboard-number">2</div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <a href="{{ url_for('recipients') }}" class="dashboard-action">
+                                View Details <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="dashboard-card">
+                        <div class="d-flex align-items-center">
+                            <div class="dashboard-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <div>
+                                <div class="dashboard-title">Successful Matches</div>
+                                <div class="dashboard-number">1</div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <a href="{{ url_for('organ_matching') }}" class="dashboard-action">
+                                Match Organs <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="recent-activity">
+                        <h4 class="mb-4">Recent Activity</h4>
+
+                        <div class="activity-item d-flex align-items-start">
+                            <div class="activity-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="activity-info">
+                                <h5>Alice Brown matched with donor John Doe</h5>
+                                <p>Kidney transplant match successfully recorded</p>
+                                <div class="activity-time">
+                                    <i class="far fa-clock me-1"></i>2 hours ago
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item d-flex align-items-start">
+                            <div class="activity-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="activity-info">
+                                <h5>New recipient added</h5>
+                                <p>Recipient "rits" added to the system</p>
+                                <div class="activity-time">
+                                    <i class="far fa-clock me-1"></i>1 day ago
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item d-flex align-items-start">
+                            <div class="activity-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="activity-info">
+                                <h5>New donor added</h5>
+                                <p>Donor "chikki" added to the system</p>
+                                <div class="activity-time">
+                                    <i class="far fa-clock me-1"></i>2 days ago
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="dashboard-card">
+                        <h4 class="mb-4">Organ Availability</h4>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Kidney</span>
+                                <span>3</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 75%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Liver</span>
+                                <span>2</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 50%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Heart</span>
+                                <span>3</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 75%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Eyes</span>
+                                <span>1</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 25%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('sidebar-toggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
