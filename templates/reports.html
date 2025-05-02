@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organ Donation System - Reports</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .stats-card {
+            transition: transform 0.3s;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        .research-card {
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+        }
+        .fact-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Organ Donation Management System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/donors">Donors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/recipients">Recipients</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/organ_matching">Matching</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/reports">Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h1 class="mb-4">Organ Donation Reports & Statistics</h1>
+
+        <!-- System Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white stats-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="fas fa-users"></i> Total Donors</h5>
+                        <h2 class="display-4">{{ stats.total_donors }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white stats-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="fas fa-heart"></i> Available Donors</h5>
+                        <h2 class="display-4">{{ stats.available_donors }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white stats-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="fas fa-user-plus"></i> Recipients</h5>
+                        <h2 class="display-4">{{ stats.total_recipients }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white stats-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="fas fa-handshake"></i> Successful Matches</h5>
+                        <h2 class="display-4">{{ stats.completed_donations }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Organ Type Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="organChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Monthly Donations Trend</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blood Type Distribution -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Blood Type Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="bloodTypeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Importance of Organ Donation -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">The Importance of Organ Donation</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <p class="lead">Organ donation is a life-saving act that can transform the lives of those suffering from organ failure. A single donor can save up to 8 lives and enhance many more through tissue donation.</p>
+
+                        <h5>Why Organ Donation Matters:</h5>
+                        <ul>
+                            <li>Over 100,000 people in the United States alone are waiting for organ transplants</li>
+                            <li>Every day, approximately 17 people die waiting for an organ transplant</li>
+                            <li>A single organ donor can save up to 8 lives</li>
+                            <li>Tissue donors can help heal more than 75 people</li>
+                            <li>Most major religions support organ donation as an act of charity</li>
+                        </ul>
+
+                        <p>Despite advances in medical technology, the demand for organ transplants far exceeds the number of donors. By choosing to be an organ donor, you can leave a lasting legacy and give the gift of life to others.</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <img src="/static/images/f6ebeb26-6524-40c2-b414-529769a153ff.jpg" class="img-fluid rounded mb-3" alt="Organ Donation">
+                        <p class="text-muted"><em>Organ donation saves lives and brings hope to thousands of people and their families.</em></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Facts -->
+        <div class="row mb-4">
+            <h4 class="mb-3">Key Facts About Organ Donation</h4>
+
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="fact-icon">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <h5>High Success Rates</h5>
+                        <p>Modern transplant procedures have success rates of 80-90% for kidneys and over 70% for heart and liver transplants.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="fact-icon">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <h5>Time is Critical</h5>
+                        <p>Most organs remain viable for transplantation for only a few hours after being removed from the donor, making timing and coordination crucial.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="fact-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h5>Global Need</h5>
+                        <p>Worldwide, millions of people could benefit from organ and tissue transplants, yet only a fraction of the needed organs are available.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Research Findings -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Recent Research Findings</h4>
+            </div>
+            <div class="card-body">
+                <div class="research-card">
+                    <h5>Advances in Immunosuppression Therapy</h5>
+                    <p>Recent research has shown significant improvements in immunosuppression medications, reducing rejection rates and improving long-term graft survival. New targeted therapies minimize side effects while maintaining efficacy.</p>
+                    <p class="text-muted"><small>Source: Journal of Transplantation Medicine, 2024</small></p>
+                </div>
+
+                <div class="research-card">
+                    <h5>Extended Criteria Donors</h5>
+                    <p>Studies indicate that organs from older donors or those with controlled medical conditions can be successfully transplanted in specific recipient populations, expanding the potential donor pool significantly.</p>
+                    <p class="text-muted"><small>Source: American Journal of Transplantation, 2023</small></p>
+                </div>
+
+                <div class="research-card">
+                    <h5>Machine Perfusion Technology</h5>
+                    <p>Novel organ preservation techniques using machine perfusion have extended viable preservation times and improved organ quality, especially for marginal organs that might otherwise be discarded.</p>
+                    <p class="text-muted"><small>Source: New England Journal of Medicine, 2024</small></p>
+                </div>
+
+                <div class="research-card">
+                    <h5>Psychological Benefits for Donor Families</h5>
+                    <p>Research shows that families who consent to donation often experience psychological benefits, with many reporting that knowing their loved one helped others provides comfort during their grief process.</p>
+                    <p class="text-muted"><small>Source: Journal of Health Psychology, 2023</small></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Types of Organ Donation -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">Types of Organ Donation</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-user me-2"></i>Living Donation</h5>
+                        <p>Living donors can donate a kidney, a portion of their liver, lung, pancreas, or intestine. This type of donation often leads to better outcomes for recipients due to shorter wait times and planned procedures.</p>
+                        <p>Common living donations include:</p>
+                        <ul>
+                            <li>Kidney (the most common living donation)</li>
+                            <li>Liver lobe</li>
+                            <li>Lung lobe</li>
+                            <li>Portion of pancreas</li>
+                            <li>Portion of intestine</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-heart me-2"></i>Deceased Donation</h5>
+                        <p>Organs and tissues that can be donated after death include:</p>
+                        <ul>
+                            <li>Heart</li>
+                            <li>Lungs</li>
+                            <li>Liver</li>
+                            <li>Kidneys</li>
+                            <li>Pancreas</li>
+                            <li>Small intestine</li>
+                            <li>Corneas</li>
+                            <li>Skin</li>
+                            <li>Heart valves</li>
+                            <li>Bone</li>
+                            <li>Blood vessels</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Donation Process -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0">The Organ Donation Process</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ol class="list-group list-group-numbered mb-4">
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Registration</div>
+                                    Potential donors register their intent through driver's license designation, donor registry, or advance directive.
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Medical Evaluation</div>
+                                    When donation becomes possible, medical professionals evaluate organ viability and potential matches.
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Matching Process</div>
+                                    Organs are matched to recipients based on medical compatibility, urgency, wait time, and geographic location.
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Recovery and Preservation</div>
+                                    Surgical teams carefully recover organs and prepare them for transport in specialized solutions.
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Transplantation</div>
+                                    Recipients undergo surgery to receive the donated organ, followed by recovery and lifelong care.
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Myths and Facts -->
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">Common Myths vs. Facts</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="accordion" id="mythsAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                        Myth: Doctors won't try as hard to save my life if they know I'm a donor
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#mythsAccordion">
+                                    <div class="accordion-body">
+                                        <strong>Fact:</strong> Medical professionals are committed to saving lives and have no access to donor status information during emergency treatment. The transplant team is only notified after all lifesaving efforts have failed and death has been declared.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingTwo">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                        Myth: My religion doesn't support organ donation
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#mythsAccordion">
+                                    <div class="accordion-body">
+                                        <strong>Fact:</strong> Most major religions support organ donation as an act of charity and goodwill. These include Christianity, Islam, Judaism, Hinduism, and Buddhism, among others. Many religious leaders actively encourage organ donation.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingThree">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                        Myth: I'm too old or unhealthy to be a donor
+                                    </button>
+                                </h2>
+                                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#mythsAccordion">
+                                    <div class="accordion-body">
+                                        <strong>Fact:</strong> There is no age limit for organ donation, and few absolute medical conditions that would prevent donation. Medical professionals evaluate each potential donor at the time of death to determine which organs and tissues are suitable for transplantation.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFour">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                                        Myth: My family will be charged for donating my organs
+                                    </button>
+                                </h2>
+                                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#mythsAccordion">
+                                    <div class="accordion-body">
+                                        <strong>Fact:</strong> There is no cost to donors or their families for organ or tissue donation. All costs related to donation are paid by the organ procurement organization or the recipient's insurance.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0">Contact Information</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>For More Information</h5>
+                        <p>If you have questions about organ donation or would like to register as a donor, please contact our support team:</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-phone me-2"></i> Helpline: (555) 123-4567</li>
+                            <li><i class="fas fa-envelope me-2"></i> Email: info@organdonation.org</li>
+                            <li><i class="fas fa-map-marker-alt me-2"></i> Address: 123 Lifesaver Street, Medical City</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Register as a Donor</h5>
+                        <p>You can register as an organ donor in several ways:</p>
+                        <ul>
+                            <li>Online at the national donor registry website</li>
+                            <li>In person at your local DMV when obtaining or renewing your driver's license</li>
+                            <li>By contacting your state's organ procurement organization</li>
+                            <li>Through our local hospital's transplant center</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 Organ Donation Management System</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Organ Type Distribution Chart
+            const organCtx = document.getElementById('organChart').getContext('2d');
+            const organChart = new Chart(organCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Kidney', 'Liver', 'Heart', 'Lung', 'Pancreas', 'Cornea', 'Other'],
+                    datasets: [{
+                        data: {{ organ_stats|safe }},
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+
+            // Monthly Donations Chart
+            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+            const monthlyChart = new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Donations',
+                        data: {{ monthly_stats|safe }},
+                        borderColor: '#4BC0C0',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Blood Type Distribution Chart
+            const bloodCtx = document.getElementById('bloodTypeChart').getContext('2d');
+            const bloodChart = new Chart(bloodCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'],
+                    datasets: [{
+                        label: 'Donors',
+                        data: {{ blood_donor_stats|safe }},
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Recipients',
+                        data: {{ blood_recipient_stats|safe }},
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
