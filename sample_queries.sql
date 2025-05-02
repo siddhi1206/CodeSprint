@@ -92,4 +92,17 @@ VALUES ('admin', 'admin123');
 SELECT * FROM admin;
 
 
+ALTER TABLE donor ADD COLUMN registration_date DATE;
+
+DELIMITER //
+CREATE TRIGGER set_registration_date
+BEFORE INSERT ON donor
+FOR EACH ROW
+BEGIN
+  IF NEW.registration_date IS NULL THEN
+    SET NEW.registration_date = CURDATE();
+  END IF;
+END;
+//
+DELIMITER ;
 
