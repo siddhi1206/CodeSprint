@@ -234,7 +234,7 @@
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="{{ url_for('reports') }}">
                     <i class="fas fa-chart-bar"></i> Reports
                 </a>
             </li>
@@ -255,7 +255,7 @@
                 </button>
                 <span class="navbar-brand">Organ Matching</span>
                 <div class="ms-auto">
-                    <a href="{{ url_for('logout') }}" class="logout-btn">
+                    <a href="#" class="logout-btn">
                         <i class="fas fa-sign-out-alt me-1"></i> Logout
                     </a>
                 </div>
@@ -263,18 +263,6 @@
         </nav>
 
         <div class="container-fluid">
-            <!-- Flash Messages -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-                {% for category, message in messages %}
-                  <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                  </div>
-                {% endfor %}
-              {% endif %}
-            {% endwith %}
-
             <!-- Page Title -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2><i class="fas fa-exchange-alt me-2"></i>Organ Matching</h2>
@@ -283,8 +271,19 @@
             <!-- Matching Form -->
             <div class="matching-form">
                 <h4 class="mb-4">Find Potential Matches</h4>
-                <form action="{{ url_for('organ_matching') }}" method="POST">
+                <form action="#" method="GET" id="matching-form">
                     <div class="row mb-3">
+                        <div class="col-md-12 mb-3">
+                            <label for="donor_id" class="form-label">Select Donor (Optional)</label>
+                            <select class="form-select" id="donor_id" name="donor_id">
+                                <option value="" selected>Search without specific donor</option>
+                                <option value="1">John Doe - A+ - Kidney</option>
+                                <option value="2">Lisa - A+ - Liver</option>
+                                <option value="3">Jenny - B- - Lungs</option>
+                            </select>
+                            <div class="form-text">If you select a donor, their blood group and organ type will be used automatically.</div>
+                        </div>
+
                         <div class="col-md-6">
                             <label for="blood_group" class="form-label">Blood Group</label>
                             <select class="form-select" id="blood_group" name="blood_group" required>
@@ -313,6 +312,7 @@
                             </select>
                         </div>
                     </div>
+
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-search me-2"></i>Find Matches
@@ -321,68 +321,113 @@
                 </form>
             </div>
 
-            <!-- Matching Results -->
-            {% if matches %}
-            <div class="results-container">
-                <h4 class="mb-4">Potential Recipients ({{ matches|length }})</h4>
-                <div class="row">
-                    {% for match in matches %}
+            <!-- Sample Donor Information Card - For demonstration -->
+            <div class="card mb-4" id="donor-info" style="display: none;">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>Selected Donor Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p class="small mb-1">Name</p>
+                            <p class="fw-bold" id="donor-name">John Doe</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p class="small mb-1">Age</p>
+                            <p class="fw-bold" id="donor-age">45</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p class="small mb-1">Blood Group</p>
+                            <p class="fw-bold" id="donor-blood">A+</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p class="small mb-1">Organ for Donation</p>
+                            <p class="fw-bold" id="donor-organ">Kidney</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matching Results - Sample Data -->
+            <div class="results-container" id="results-container" style="display: none;">
+                <h4 class="mb-4">Potential Recipients (<span id="match-count">2</span>)</h4>
+                <div class="row" id="match-results">
+                    <!-- Sample Match 1 -->
                     <div class="col-md-6 mb-3">
                         <div class="match-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="mb-0">{{ match.name }}</h5>
-                                <span class="blood-badge
-                                    {% if match.blood_group == 'A+' %}badge-a-pos
-                                    {% elif match.blood_group == 'A-' %}badge-a-neg
-                                    {% elif match.blood_group == 'B+' %}badge-b-pos
-                                    {% elif match.blood_group == 'B-' %}badge-b-neg
-                                    {% elif match.blood_group == 'AB+' %}badge-ab-pos
-                                    {% elif match.blood_group == 'AB-' %}badge-ab-neg
-                                    {% elif match.blood_group == 'O+' %}badge-o-pos
-                                    {% elif match.blood_group == 'O-' %}badge-o-neg
-                                    {% endif %}">
-                                    {{ match.blood_group }}
-                                </span>
+                                <h5 class="mb-0">Mary Wilson</h5>
+                                <span class="blood-badge badge-a-pos">A+</span>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <p class="small mb-1">Age</p>
-                                    <p class="fw-bold">{{ match.age }}</p>
+                                    <p class="fw-bold">52</p>
                                 </div>
                                 <div class="col-md-6">
                                     <p class="small mb-1">Gender</p>
-                                    <p class="fw-bold">{{ match.gender }}</p>
+                                    <p class="fw-bold">Female</p>
                                 </div>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <p class="small mb-1">Organ Needed</p>
-                                    <p class="fw-bold">{{ match.organ_needed }}</p>
+                                    <p class="fw-bold">Kidney</p>
                                 </div>
                                 <div class="col-md-6">
                                     <p class="small mb-1">City</p>
-                                    <p class="fw-bold">{{ match.city }}</p>
+                                    <p class="fw-bold">Chicago</p>
                                 </div>
                             </div>
                             <div class="d-grid gap-2">
-                                <form action="{{ url_for('record_donation') }}" method="POST">
-                                    <input type="hidden" name="donor_id" value="{{request.form.get('donor_id', '')}}">
-                                    <input type="hidden" name="recipient_id" value="{{ match.recipient_id }}">
-                                    <button type="submit" class="btn btn-success w-100">
-                                        <i class="fas fa-handshake me-2"></i>Record Donation
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-success w-100 record-btn">
+                                    <i class="fas fa-handshake me-2"></i>Record Donation
+                                </button>
                             </div>
                         </div>
                     </div>
-                    {% endfor %}
+
+                    <!-- Sample Match 2 -->
+                    <div class="col-md-6 mb-3">
+                        <div class="match-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">David Brown</h5>
+                                <span class="blood-badge badge-a-neg">A-</span>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="small mb-1">Age</p>
+                                    <p class="fw-bold">39</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="small mb-1">Gender</p>
+                                    <p class="fw-bold">Male</p>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="small mb-1">Organ Needed</p>
+                                    <p class="fw-bold">Kidney</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="small mb-1">City</p>
+                                    <p class="fw-bold">New York</p>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-success w-100 record-btn">
+                                    <i class="fas fa-handshake me-2"></i>Record Donation
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            {% elif request.method == 'POST' %}
-            <div class="alert alert-info">
+
+            <!-- No matches message -->
+            <div class="alert alert-info" id="no-matches" style="display: none;">
                 <i class="fas fa-info-circle me-2"></i>No matching recipients found for the selected criteria.
             </div>
-            {% endif %}
         </div>
     </div>
 
@@ -395,6 +440,76 @@
             $('.toggle-btn').click(function() {
                 $('.sidebar').toggleClass('active');
                 $('.content').toggleClass('active');
+            });
+
+            // Sample data for demonstration purposes
+            const donorData = {
+                "1": { name: "John Doe", age: 45, blood_group: "A+", organ_donated: "Kidney" },
+                "2": { name: "Lisa", age: 52, blood_group: "A+", organ_donated: "Liver" },
+                "3": { name: "Jenny", age: 32, blood_group: "B-", organ_donated: "Lungs" }
+            };
+
+            // Handle donor selection
+            $('#donor_id').change(function() {
+                const donorId = $(this).val();
+
+                if (donorId) {
+                    // Get donor data
+                    const donor = donorData[donorId];
+
+                    // Update form and show donor info
+                    $('#blood_group').val(donor.blood_group).prop('disabled', true);
+                    $('#organ_type').val(donor.organ_donated).prop('disabled', true);
+
+                    // Update donor info card
+                    $('#donor-name').text(donor.name);
+                    $('#donor-age').text(donor.age);
+                    $('#donor-blood').text(donor.blood_group);
+                    $('#donor-organ').text(donor.organ_donated);
+                    $('#donor-info').show();
+
+                    // Show sample results
+                    $('#results-container').show();
+                    $('#no-matches').hide();
+                } else {
+                    // Reset form
+                    $('#blood_group').val('').prop('disabled', false);
+                    $('#organ_type').val('').prop('disabled', false);
+                    $('#donor-info').hide();
+                    $('#results-container').hide();
+                    $('#no-matches').hide();
+                }
+            });
+
+            // Handle form submission
+            $('#matching-form').submit(function(e) {
+                e.preventDefault();
+
+                const bloodGroup = $('#blood_group').val();
+                const organType = $('#organ_type').val();
+
+                if (bloodGroup && organType) {
+                    // Show sample results or no matches based on selection
+                    if (bloodGroup === 'A+' && organType === 'Kidney') {
+                        $('#results-container').show();
+                        $('#no-matches').hide();
+                    } else {
+                        $('#results-container').hide();
+                        $('#no-matches').show();
+                    }
+                    if (bloodGroup === 'B+' && organType === 'Eyes') {
+                        $('#results-container').show();
+                        $('#no-matches').hide();
+                    } else {
+                        $('#results-container').hide();
+                        $('#no-matches').show();
+                    }
+                }
+            });
+
+            // Handle record donation button
+            $('.record-btn').click(function() {
+                alert('Donation recorded successfully!');
             });
         });
     </script>
